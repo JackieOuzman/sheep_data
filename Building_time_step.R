@@ -7,17 +7,30 @@ library(ggplot2)
 library(readr)
 install.packages("hms")
 library(hms)
+library(readxl)
+test <- read_excel("C:/Users/ouz001/pasture_utilisation/Take2/week1/start_end/EF_Group_1_d1_filter_start_end_collar_R_GDA.xls")
 
-test<- read_csv("C:/Users/ouz001/pasture_utilisation/Take2/raw_data/Week 3/EF_Group_3_d1.csv", skip=63) %>% 
-  select(ID, trksegID, lat, lon,  ele, time) %>% 
-  mutate(file_name = "EF_Group_3_d1.csv") %>% 
-  separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
-  select(-group)%>% 
-  separate(day_of_exp,into =  c("day_of_exp"),  sep = ".csv", remove = FALSE ) %>% 
-  mutate(hms = hms::as.hms(time),
-         date= date(time),
-         month = month(time),
-         day = day(time))
+
+#what is the min time?
+
+
+min_time_EF_group1_d1 <- (min(test$hms))
+print(min_time_EF_group1_d1)
+
+#create a new Df with start time of min_time_EF_group1_d1 then every 1min for 4 hours
+#How many seconds in 4hours
+4*60*60
+max_time_EF_group1_d1 <- hms(min_time_EF_group1_d1) + hms('4:00:00')
+print(max_time_EF_group1_d1)
+as.hms
+time_step <- data.frame(hms_1sec = as.hms(c("09:15:02"),("09:15:03")))
+
+time_step1 <- as.data.frame(x, row.names = NULL, optional = FALSE, ...,
+              nm = paste(deparse(substitute(x), width.cutoff = 500L), collapse = " "))
+https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/as.data.frame
+
+df <- data.frame(hms_1sec=as.hms("01/01/2000", format="%m/%d/%Y"), 
+                 File="", User="", stringsAsFactors=FALSE)
 
 ###               1) Plot data to chcekThis is a very important step to make sure I am not including too much data          ######
 ggplot(test, aes(time, hms))+
