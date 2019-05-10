@@ -73,7 +73,7 @@ EF_Group_1_d1<- read_csv("C:/Users/ouz001/pasture_utilisation/Take2/raw_data/Wee
          month = month(time),
          day = day(time))
 
-#glimpse(EF_Group_1_d1)
+glimpse(EF_Group_1_d1)
 #glimpse(codes_EF_Group_1_d1)
 ###JOIN The sheep code data based on   trksegID
   
@@ -85,14 +85,18 @@ EF_Group_1_d1 <- left_join(EF_Group_1_d1, codes_EF_Group_1_d1, by= "trksegID") %
 write.csv(EF_Group_1_d1, "EF_Group_1_d1.csv") 
 ####filtering data with time
 EF_Group_1_d1_filter_start <- filter(EF_Group_1_d1, hms > hms('09:15:00'))
-write.csv(EF_Group_1_d1_filter_start, "EF_Group_1_d1_filter_start.csv")
+end_timeEF_Group_1_d1_filter_start <- hms('09:15:00') + hms('04:00:00')
+EF_Group_1_d1_filter_start_end <- filter(EF_Group_1_d1_filter_start, hms < (end_timeEF_Group_1_d1_filter_start))
+glimpse(EF_Group_1_d1_filter_start_end)
+
+write.csv(EF_Group_1_d1_filter_start_end, "EF_Group_1_d1_filter_start_end.csv")
 glimpse(EF_Group_1_d1_filter_start)
 
-EF_Group_1_d1_filter_start_hh <- filter(EF_Group_1_d1_filter_start, type != "collar")
-EF_Group_1_d1_filter_start_collar <- filter(EF_Group_1_d1_filter_start, type == "collar")
-write.csv(EF_Group_1_d1_filter_start_hh, "EF_Group_1_d1_filter_start_hh_R.csv")
-write.csv(EF_Group_1_d1_filter_start_collar, "EF_Group_1_d1_filter_start_collar_R.csv") 
-glimpse(EF_Group_1_d1_filter_start_hh)
+EF_Group_1_d1_filter_start_end_hh <- filter(EF_Group_1_d1_filter_start_end, type != "collar")
+EF_Group_1_d1_filter_start_end_collar <- filter(EF_Group_1_d1_filter_start_end, type == "collar")
+write.csv(EF_Group_1_d1_filter_start_end_hh, "EF_Group_1_d1_filter_start_end_hh_R.csv")
+write.csv(EF_Group_1_d1_filter_start_end_collar, "EF_Group_1_d1_filter_start_end_collar_R.csv") 
+glimpse(EF_Group_1_d1_filter_start_end_hh)
 
 
      
@@ -109,8 +113,8 @@ EF_Group_1_d2<- read_csv("C:/Users/ouz001/pasture_utilisation/Take2/raw_data/Wee
          month = month(time),
          day = day(time))
 ###JOIN The sheep code data based on   trksegID
-#glimpse(EF_Group_1_d2)
-#glimpse(codes_EF_Group_1_d2)
+glimpse(EF_Group_1_d2)
+glimpse(codes_EF_Group_1_d2)
 EF_Group_1_d2 <- left_join(EF_Group_1_d2, codes_EF_Group_1_d2, by= "trksegID") %>% 
   separate(name,into =  c("sheep", "type", "temp"),  sep = "_", remove = FALSE ) %>% 
   select(-ID.y,
@@ -119,14 +123,18 @@ EF_Group_1_d2 <- left_join(EF_Group_1_d2, codes_EF_Group_1_d2, by= "trksegID") %
          -trksegID1)
 write.csv(EF_Group_1_d2, "EF_Group_1_d2.csv") 
 EF_Group_1_d2_filter_start <- filter(EF_Group_1_d2, hms > hms('09:00:00'))
-write.csv(EF_Group_1_d2_filter_start, "EF_Group_1_d2_filter_start.csv")
-glimpse(EF_Group_1_d2_filter_start)
+end_timeEF_Group_1_d2 <- hms('09:00:00') + hms('04:00:00')
+EF_Group_1_d2_filter_start_end <- filter(EF_Group_1_d2_filter_start, hms < end_timeEF_Group_1_d2)
 
-EF_Group_1_d2_filter_start_hh <- filter(EF_Group_1_d2_filter_start, type != "collar")
-EF_Group_1_d2_filter_start_collar <- filter(EF_Group_1_d2_filter_start, type == "collar")
-write.csv(EF_Group_1_d2_filter_start_hh, "EF_Group_1_d2_filter_start_hh_R.csv")
-write.csv(EF_Group_1_d2_filter_start_collar, "EF_Group_1_d2_filter_start_collar_R.csv") 
-glimpse(EF_Group_1_d2_filter_start_hh)
+
+write.csv(EF_Group_1_d2_filter_start_end, "EF_Group_1_d2_filter_start_end.csv")
+glimpse(EF_Group_1_d2_filter_start_end)
+
+EF_Group_1_d2_filter_start_end_hh <- filter(EF_Group_1_d2_filter_start_end, type != "collar")
+EF_Group_1_d2_filter_start_end_collar <- filter(EF_Group_1_d2_filter_start_end, type == "collar")
+write.csv(EF_Group_1_d2_filter_start_end_hh, "EF_Group_1_d2_filter_start_end_hh_R.csv")
+write.csv(EF_Group_1_d2_filter_start_end_collar, "EF_Group_1_d2_filter_start_end_collar_R.csv") 
+glimpse(EF_Group_1_d2_filter_start_end_hh)
 
 
 ###EF_Group_1_d3###
@@ -142,7 +150,7 @@ EF_Group_1_d3<- read_csv("C:/Users/ouz001/pasture_utilisation/Take2/raw_data/Wee
          day = day(time))
 ###JOIN The sheep code data based on   trksegID
 glimpse(EF_Group_1_d3)
-#glimpse(codes_EF_Group_1_d3)
+glimpse(codes_EF_Group_1_d3)
 EF_Group_1_d3 <- left_join(EF_Group_1_d3, codes_EF_Group_1_d3, by= "trksegID") %>% 
   separate(name,into =  c("sheep", "type", "temp"),  sep = "_", remove = FALSE ) %>% 
   select(-ID.y,
@@ -151,14 +159,17 @@ EF_Group_1_d3 <- left_join(EF_Group_1_d3, codes_EF_Group_1_d3, by= "trksegID") %
          -trksegID1)  
 write.csv(EF_Group_1_d3, "EF_Group_1_d3.csv")
 EF_Group_1_d3_filter_start <- filter(EF_Group_1_d3, hms > hms('08:50:00'))
-write.csv(EF_Group_1_d3_filter_start, "EF_Group_1_d3_filter_start.csv")
-glimpse(EF_Group_1_d3_filter_start)
+end_timeEF_Group_1_d3 <- hms('08:50:00') + hms('04:00:00')
+EF_Group_1_d3_filter_start_end <- filter(EF_Group_1_d3_filter_start, hms < end_timeEF_Group_1_d3)
 
-EF_Group_1_d3_filter_start_hh <- filter(EF_Group_1_d3_filter_start, type != "collar")
-EF_Group_1_d3_filter_start_collar <- filter(EF_Group_1_d3_filter_start, type == "collar")
-write.csv(EF_Group_1_d3_filter_start_hh, "EF_Group_1_d3_filter_start_hh_R.csv")
-write.csv(EF_Group_1_d3_filter_start_collar, "EF_Group_1_d3_filter_start_collar_R.csv") 
-glimpse(EF_Group_1_d3_filter_start_hh)
+write.csv(EF_Group_1_d3_filter_start_end, "EF_Group_1_d3_filter_start_end.csv")
+glimpse(EF_Group_1_d3_filter_start_end)
+
+EF_Group_1_d3_filter_start_end_hh <- filter(EF_Group_1_d3_filter_start_end, type != "collar")
+EF_Group_1_d3_filter_start_end_collar <- filter(EF_Group_1_d3_filter_start_end, type == "collar")
+write.csv(EF_Group_1_d3_filter_start_end_hh, "EF_Group_1_d3_filter_start_end_hh_R.csv")
+write.csv(EF_Group_1_d3_filter_start_end_collar, "EF_Group_1_d3_filter_start_end_collar_R.csv") 
+glimpse(EF_Group_1_d3_filter_start_end_hh)
 
   
 ###EF_Group_1_d4###
@@ -183,14 +194,19 @@ EF_Group_1_d4 <- left_join(EF_Group_1_d4, codes_EF_Group_1_d4, by= "trksegID") %
          -trksegID1)   
 write.csv(EF_Group_1_d4, "EF_Group_1_d4.csv")  
 EF_Group_1_d4_filter_start <- filter(EF_Group_1_d4, hms > hms('08:33:00'))
-write.csv(EF_Group_1_d4_filter_start, "EF_Group_1_d4_filter_start.csv")
-glimpse(EF_Group_1_d4_filter_start)
+end_timeEF_Group_1_d4 <- hms('08:33:00') + hms('04:00:00')
+EF_Group_1_d4_filter_start_end <- filter(EF_Group_1_d4_filter_start, hms < end_timeEF_Group_1_d4)
 
-EF_Group_1_d4_filter_start_hh <- filter(EF_Group_1_d4_filter_start, type != "collar")
-EF_Group_1_d4_filter_start_collar <- filter(EF_Group_1_d4_filter_start, type == "collar")
-write.csv(EF_Group_1_d4_filter_start_hh, "EF_Group_1_d4_filter_start_hh_R.csv")
-write.csv(EF_Group_1_d4_filter_start_collar, "EF_Group_1_d4_filter_start_collar_R.csv") 
-glimpse(EF_Group_1_d4_filter_start_hh)
+
+
+write.csv(EF_Group_1_d4_filter_start_end, "EF_Group_1_d4_filter_start_end.csv")
+glimpse(EF_Group_1_d4_filter_start_end)
+
+EF_Group_1_d4_filter_start_end_hh <- filter(EF_Group_1_d4_filter_start_end, type != "collar")
+EF_Group_1_d4_filter_start_end_collar <- filter(EF_Group_1_d4_filter_start_end, type == "collar")
+write.csv(EF_Group_1_d4_filter_start_end_hh, "EF_Group_1_d4_filter_start_end_hh_R.csv")
+write.csv(EF_Group_1_d4_filter_start_end_collar, "EF_Group_1_d4_filter_start_end_collar_R.csv") 
+glimpse(EF_Group_1_d4_filter_start_end_hh)
 
 ###VF_Group_1_d1###
 
@@ -224,14 +240,18 @@ VF_Group_1_d1 <- left_join(VF_Group_1_d1, codes_VF_Group_1_d1, by= "trksegID") %
 glimpse(VF_Group_1_d1)
 write.csv(VF_Group_1_d1, "VF_Group_1_d1.csv")
 VF_Group_1_d1_filter_start <- filter(VF_Group_1_d1, hms > hms('09:25:00'))
-write.csv(VF_Group_1_d1_filter_start, "VF_Group_1_d1_filter_start.csv")
-glimpse(VF_Group_1_d1_filter_start)
+end_timeVF_Group_1_d1 <- hms('09:25:00') + hms('04:00:00')
+VF_Group_1_d1_filter_start_end <- filter(VF_Group_1_d1_filter_start, hms < end_timeVF_Group_1_d1)
 
-VF_Group_1_d1_filter_start_hh <- filter(VF_Group_1_d1_filter_start, type != "collar")
-VF_Group_1_d1_filter_start_collar <- filter(VF_Group_1_d1_filter_start, type == "collar")
-write.csv(VF_Group_1_d1_filter_start_hh, "VF_Group_1_d1_filter_start_hh_R.csv")
-write.csv(VF_Group_1_d1_filter_start_collar, "VF_Group_1_d1_filter_start_collar_R.csv") 
-glimpse(VF_Group_1_d1_filter_start_hh)
+
+write.csv(VF_Group_1_d1_filter_start_end, "VF_Group_1_d1_filter_start_end.csv")
+glimpse(VF_Group_1_d1_filter_start_end)
+
+VF_Group_1_d1_filter_start_end_hh <- filter(VF_Group_1_d1_filter_start_end, type != "collar")
+VF_Group_1_d1_filter_start_end_collar <- filter(VF_Group_1_d1_filter_start_end, type == "collar")
+write.csv(VF_Group_1_d1_filter_start_end_hh, "VF_Group_1_d1_filter_start_end_hh_R.csv")
+write.csv(VF_Group_1_d1_filter_start_end_collar, "VF_Group_1_d1_filter_start_end_collar_R.csv") 
+glimpse(VF_Group_1_d1_filter_start_end_hh)
 
 ###VF_Group_1_d2###
 
@@ -262,13 +282,16 @@ VF_Group_1_d2 <- left_join(VF_Group_1_d2, codes_VF_Group_1_d2, by= "trksegID") %
 write.csv(VF_Group_1_d2, "VF_Group_1_d2.csv")
 VF_Group_1_d2_filter_start <- filter(VF_Group_1_d2, hms > hms('09:15:00'))
 write.csv(VF_Group_1_d2_filter_start, "VF_Group_1_d2_filter_start.csv")
-glimpse(VF_Group_1_d2_filter_start)
+end_timeVF_Group_1_d2 <- hms('09:15:00') + hms('04:00:00')
+VF_Group_1_d2_filter_start_end <- filter(VF_Group_1_d2_filter_start, hms < end_timeVF_Group_1_d2)
 
-VF_Group_1_d2_filter_start_hh <- filter(VF_Group_1_d2_filter_start, type != "collar")
-VF_Group_1_d2_filter_start_collar <- filter(VF_Group_1_d2_filter_start, type == "collar")
-write.csv(VF_Group_1_d2_filter_start_hh, "VF_Group_1_d2_filter_start_hh_R.csv")
-write.csv(VF_Group_1_d2_filter_start_collar, "VF_Group_1_d2_filter_start_collar_R.csv") 
-glimpse(VF_Group_1_d2_filter_start_hh)
+glimpse(VF_Group_1_d2_filter_start_end)
+
+VF_Group_1_d2_filter_start_end_hh <- filter(VF_Group_1_d2_filter_start_end, type != "collar")
+VF_Group_1_d2_filter_start_end_collar <- filter(VF_Group_1_d2_filter_start_end, type == "collar")
+write.csv(VF_Group_1_d2_filter_start_end_hh, "VF_Group_1_d2_filter_start_end_hh_R.csv")
+write.csv(VF_Group_1_d2_filter_start_end_collar, "VF_Group_1_d2_filter_start_end_collar_R.csv") 
+glimpse(VF_Group_1_d2_filter_start_end_hh)
 ###VF_Group_1_d3###
 
 VF_Group_1_d3<- read_csv("C:/Users/ouz001/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d3.csv", skip=63) %>% 
@@ -297,14 +320,17 @@ VF_Group_1_d3 <- left_join(VF_Group_1_d3, codes_VF_Group_1_d3, by= "trksegID") %
          -sheep1)     
 write.csv(VF_Group_1_d3, "VF_Group_1_d3.csv") 
 VF_Group_1_d3_filter_start <- filter(VF_Group_1_d3, hms > hms('08:53:00'))
-write.csv(VF_Group_1_d3_filter_start, "VF_Group_1_d3_filter_start.csv")
-glimpse(VF_Group_1_d3_filter_start)
+end_timeVF_Group_1_d3 <- hms('08:53:00') + hms('04:00:00')
+VF_Group_1_d3_filter_start_end <- filter(VF_Group_1_d3_filter_start, hms < end_timeVF_Group_1_d3)
 
-VF_Group_1_d3_filter_start_hh <- filter(VF_Group_1_d3_filter_start, type != "collar")
-VF_Group_1_d3_filter_start_collar <- filter(VF_Group_1_d3_filter_start, type == "collar")
-write.csv(VF_Group_1_d3_filter_start_hh, "VF_Group_1_d3_filter_start_hh_R.csv")
-write.csv(VF_Group_1_d3_filter_start_collar, "VF_Group_1_d3_filter_start_collar_R.csv") 
-glimpse(VF_Group_1_d3_filter_start_hh)
+write.csv(VF_Group_1_d3_filter_start_end, "VF_Group_1_d3_filter_start_end.csv")
+glimpse(VF_Group_1_d3_filter_start_end)
+
+VF_Group_1_d3_filter_start_end_hh <- filter(VF_Group_1_d3_filter_start_end, type != "collar")
+VF_Group_1_d3_filter_start_end_collar <- filter(VF_Group_1_d3_filter_start_end, type == "collar")
+write.csv(VF_Group_1_d3_filter_start_end_hh, "VF_Group_1_d3_filter_start_end_hh_R.csv")
+write.csv(VF_Group_1_d3_filter_start_end_collar, "VF_Group_1_d3_filter_start_end_collar_R.csv") 
+glimpse(VF_Group_1_d3_filter_start_end_hh)
 ###VF_Group_1_d4###
 
 VF_Group_1_d4<- read_csv("C:/Users/ouz001/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d4.csv", skip=63) %>% 
@@ -334,14 +360,17 @@ VF_Group_1_d4 <- left_join(VF_Group_1_d4, codes_VF_Group_1_d4, by= "trksegID") %
 
 write.csv(VF_Group_1_d4, "VF_Group_1_d4.csv")   
 VF_Group_1_d4_filter_start <- filter(VF_Group_1_d4, hms > hms('08:43:00'))
-write.csv(VF_Group_1_d4_filter_start, "VF_Group_1_d4_filter_start.csv")
-glimpse(VF_Group_1_d4_filter_start)
+end_timeVF_Group_1_d4 <- hms('08:43:00') + hms('04:00:00')
+VF_Group_1_d4_filter_start_end <- filter(VF_Group_1_d4_filter_start, hms < end_timeVF_Group_1_d4)
 
-VF_Group_1_d4_filter_start_hh <- filter(VF_Group_1_d4_filter_start, type != "collar")
-VF_Group_1_d4_filter_start_collar <- filter(VF_Group_1_d4_filter_start, type == "collar")
-write.csv(VF_Group_1_d4_filter_start_hh, "VF_Group_1_d4_filter_start_hh_R.csv")
-write.csv(VF_Group_1_d4_filter_start_collar, "VF_Group_1_d4_filter_start_collar_R.csv") 
-glimpse(VF_Group_1_d4_filter_start_hh)
+write.csv(VF_Group_1_d4_filter_start_end, "VF_Group_1_d4_filter_start_end.csv")
+glimpse(VF_Group_1_d4_filter_start_end)
+
+VF_Group_1_d4_filter_start_end_hh <- filter(VF_Group_1_d4_filter_start_end, type != "collar")
+VF_Group_1_d4_filter_start_end_collar <- filter(VF_Group_1_d4_filter_start_end, type == "collar")
+write.csv(VF_Group_1_d4_filter_start_end_hh, "VF_Group_1_d4_filter_start_end_hh_R.csv")
+write.csv(VF_Group_1_d4_filter_start_end_collar, "VF_Group_1_d4_filter_start_end_collar_R.csv") 
+glimpse(VF_Group_1_d4_filter_start_end_hh)
   
   
   
@@ -366,13 +395,5 @@ glimpse(VF_Group_1_d4_filter_start_hh)
 
 
 
-#divide data up into type collar and hh
-
-group1_week1_ef_hh <- filter(group1_week1_ef, type != "collar")
-group1_week1_ef_collar <- filter(group1_week1_ef, type == "collar")
-glimpse(group1_week1_ef_hh)
-glimpse(group1_week1_ef_collar)
-write.csv(group1_week1_ef_collar, "group1_week1_ef_collar_postR.csv")
-write.csv(group1_week1_ef_hh, "group1_week1_ef_hh_postR.csv")
 
 #
