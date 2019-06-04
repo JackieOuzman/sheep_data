@@ -8,7 +8,7 @@ library(readr)
 
 
 ##### week 1 ######
-
+#now connected to GIT hub
 setwd("c:/Users/ouz001/pasture_utilisation/Take2")
 
 
