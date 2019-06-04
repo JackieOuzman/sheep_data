@@ -112,7 +112,7 @@ print(sheep_names_EF_Group_1_d1)
 #subet each list in split_sheep to make df
 
 sheep21_collar_d1 <- split_sheep[[1]]
-glimpse(Sheep_21_collar_d1)
+glimpse(sheep21_collar_d1)
 Sheep22_collar_d1 <- split_sheep[[2]]  
 Sheep23_collar_d1 <- split_sheep[[3]]  
 Sheep24_collar_d1 <- split_sheep[[4]]
@@ -133,8 +133,8 @@ glimpse(Sheep23_collar_d1)
 
 #step 1 join
 glimpse(df_sec1) #14401 data pts
-glimpse(glimpse(Sheep_21_collar_d1)) # 343 data pts for Sheep_21_collar_d1
-Sheep_21_collar_d1_time_step1 <- full_join(df_sec1, Sheep_21_collar_d1, by = "hms")
+glimpse(sheep21_collar_d1) # 343 data pts for Sheep_21_collar_d1
+Sheep_21_collar_d1_time_step1 <- full_join(df_sec1, sheep21_collar_d1, by = "hms")
 glimpse(Sheep_21_collar_d1_time_step1) #14401 data pts
 
 #step 2 fill in missing values 
@@ -166,10 +166,39 @@ dim(Sheep_22_collar_d1_time_step)
 ggplot(Sheep_21_collar_d1_time_step, aes(hms, lon))+
   geom_point()
 
+############################################################################################################################
+####################          make some new variable                                      ##################################
+#############################################################################################################################
 
 
+df <-  mutate(Sheep_21_collar_d1_time_step,
+    time_diff = lead(hms) - hms)
+glimpse(df_1)
+df_1 <- mutate(Sheep_21_collar_d1_time_step,
+               x_diff = lead(POINT_X) - POINT_X,
+               y_diff = lead(POINT_Y) - POINT_Y)
+
+power(lead(Sheep_21_collar_d1_time_step$POINT_X) - Sheep_21_collar_d1_time_step$POINT_X, lambda =2)
 
 
+df_2 <- mutate(df_1,
+               x_diff_power2 = power(lead(POINT_X) - POINT_X, lambda =2),
+               y_diff_power2 = power(lead(POINT_Y) - POINT_Y, lambda = 2))
+
+#ts <- Sheep_21_collar_d1_time_step %>% arrange(hms) %>%
+#  mutate(time_diff_2 = as.numeric(hms-lag(hms), units = 'mins'))
+#glimpse(ts)
+
+ts1 <- Sheep_21_collar_d1_time_step %>% arrange(hms) %>%
+  mutate(distance = power(POINT_X-lag(POINT_X)))
+glimpse(ts)
+
+
+#Sheep_21_collar_d1_time_step = mutate(Sheep_21_collar_d1_time_step,
+#                                      Distance = sqrt (Power(x2 - x1)2 + (Power(y2 - y1)2),
+#                                       time_lapsed = hms2 - hms1
+#                                      Speed_m_per_s = distance /time laspsed
+#
 
 ###               1) Plot data to chcekThis is a very important step to make sure I am not including too much data          ######
 ggplot(test, aes(time, hms))+
