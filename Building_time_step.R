@@ -17,63 +17,73 @@ library(readr)
 
 
 
-#date_time_start_IS <- ISOdatetime(date_time_start)
+glimpse(EF_Group_1_d1_filter_start_end_collar)
 
-#min_date_time_EF_group1_d1 <- ISOdatetime(paste0("2018-10-29 ", min_time_EF_group1_d1))
-#min_date_time_EF_group1_d1 <- ISOdatetime(paste0("2018-10-29 ","09:15:02"))
-#print(min_date_time_EF_group1_d1)
+############################################################################################################################
+####################                    Min time for data set                     #########################################
+############################################################################################################################
 
-#create a new Df with start time of min_time_EF_group1_d1 then every 1min for 4 hours
-#How many seconds in 4hours
-#4*60*60
-#max_time_EF_group1_d1 <- hms('09:15:02') + hms('4:00:00')
-#max_time_EF_group1_d1 <- hms(min_time_EF_group1_d1) + hms('4:00:00')
-#print(max_time_EF_group1_d1)
-
-#Working out how to make df with regular time step
-#test_df1 <- data.frame(time_step = dmy_hms ("29/10/18 09:15:02","29/10/18 09:15:03", "29/10/18 09:15:04"))
-#test_df2 <- data.frame(time_step = dmy_hms (seq(from = "29/10/18 09:15:02", to = "29/10/18 09:15:04")))
-#test_df3 <- seq(from = as.Date("29/10/18 09:15:02 ", "dmy_hms"), to = as.Date("29/10/18 10:15:02 ", "dmy_hms"), by = "hour")
-#test_df4 <- data.frame(time_step = (seq(c(ISOdate(2018,10,29)), by = "min", length.out = 10)))
-#test_df_min <- data.frame(time_step = (seq(c(ISOdate(2018,10,29, 09,15,02)), by = "min", length.out = 12)))
-#test_df_sec <- data.frame(time_step = (seq(c(ISOdate(2018,10,29, 09,15,02)), by = "sec", length.out = 12)))
-#test_df_sec1 <- data.frame(time_step =seq(from = (ISOdate(2018,10,29, 09,15,02)), to = (ISOdate(2018,10,29, 09,15,35)), by = "sec"))
-#(ISOdate(2018,10,29, min_time_EF_group1_d1))
-#test_df_sec1 <- data.frame(time_step =seq(from = (date_time_start), to = (ISOdate(2018,10,29, 09,15,35)), by = "sec"))
-
-
-
-test <- read_excel("C:/Users/ouz001/pasture_utilisation/Take2/week1/start_end/EF_Group_1_d1_filter_start_end_collar_R_GDA.xls")
-
-
-
-min_time <- (min(test$hms))
-print(min_time)
+min_time1 <- (min(EF_Group_1_d1_filter_start_end_collar$hms))
+print(min_time1) 
+print(hms::as.hms(min_time1) )
+min_time <- hms::as.hms(min_time1)
+print(min_time) 
 date_time_start <- as_datetime(paste0("2018-10-29 ", min_time))
+############################################################################################################################
+####################                    Max time for data set                     #########################################
+############################################################################################################################
 print(date_time_start)
 date_time_end <- date_time_start + hms('4:00:00')
 print(date_time_end)
+
+############################################################################################################################
+####################                    time step starting at min and ending at max       ##################################
+####################                    time step every second                            ##################################
+############################################################################################################################
+
 df_sec1 <- data.frame(time_step =seq(from = (date_time_start), to = (date_time_end), by = "sec"))
 head(df_sec1)
 
-#from this make a clm that just has time
+############################################################################################################################
+####################          make df into 2 clms one with date/time and one with time     ##################################
+#############################################################################################################################
+
 
 df_sec1 <- mutate(df_sec1,
                   hms = hms::as.hms(time_step, tz = "UTM"))
 
 
-test <- mutate(test, time = as_datetime(time),
-               hms = as.hms(time))
-                  
-##Now merege time step data and captured data
+
+############################################################################################################################
+####################           slip logged data into df for each sheep                     ##################################
+#############################################################################################################################
+glimpse(codes_EF_Group_1_d1)
+glimpse(glimpse(EF_Group_1_d1_filter_start_end_collar)) # 1732 data pts for all sheep
+
+#this works but gives me a list I want a df
+split_sheep <- split(EF_Group_1_d1_filter_start_end_collar, EF_Group_1_d1_filter_start_end_collar$sheep, drop = FALSE)
+glimpse(split_sheep)
+
+library(tidyverse)
+test_df_split <- map(split_sheep, paste0, collapse = " ") %>% bind_rows() %>% gather(POS, Word)
+glimpse(test_df_split)
+
+test_df_split2 <- map(split_sheep, paste0, collapse = " ") 
+glimpse(test_df_split2)
+
+
+
+
+############################################################################################################################
+####################           merege time step data and logged data                     ##################################
+#############################################################################################################################                  
+
 #fill(df, clm, .direction = c("down"))  
 #fill(df, clm)
-glimpse(df_sec1)
-glimpse(test) # need to format as character
-
-
-
-
+glimpse(df_sec1) #14401 data pts
+glimpse(glimpse(EF_Group_1_d1_filter_start_end_collar)) # 1732 data pts for all sheep
+test <- full_join(df_sec1, EF_Group_1_d1_filter_start_end_collar, by = "hms")
+glimpse(test)
 
 time_step_EF_Group_1_d1 <- (left_join(df_sec1,test, by = "hms"))
 
@@ -143,3 +153,7 @@ glimpse(time_step)
 #Try these to fill in missing values - perhaps use mutate to chcek
 #fill(df, clm, .direction = c("down"))  
 #fill(df, clm)
+
+
+
+### I want to convert long lat to easting and northing
