@@ -8,13 +8,52 @@ library(readr)
 
 #install.packages("hms")
 #library(hms)
+library(sp)
+library(biogeo)
+library(stringr)
+library(rgdal)
+library(sf)
 
 
 
-#what is the min time? then how to merege this to get a date time value
+############################################################################################################################
+####################          Day 1   EF_Group_1_d1_filter_start_end_collar               ##################################
+#############################################################################################################################
+
+glimpse(EF_Group_1_d1_filter_start_end_collar)
 
 
+############################################################################################################################
+####################          convert lat and longs to x and Y                             ##################################
+#############################################################################################################################
 
+
+#https://spatialreference.org/ref/epsg/gda94-mga-zone-56/
+#epsg projection 28356
+
+mapCRS <- CRS("+init=epsg:28356")     # 28356 = GDA_1994_MGA_Zone_56
+wgs84CRS <- CRS("+init=epsg:4326")   # 4326 WGS 84 - assumed for input lats and longs
+
+glimpse(EF_Group_1_d1_filter_start_end_collar) 
+
+#start of file has some missing data that has not been filled
+EF_Group_1_d1_filter_start_end_collar_1 <-drop_na(EF_Group_1_d1_filter_start_end_collar)
+glimpse(EF_Group_1_d1_filter_start_end_collar_1)
+
+
+coordinates(EF_Group_1_d1_filter_start_end_collar_1) <- ~ lon + lat
+
+proj4string(EF_Group_1_d1_filter_start_end_collar_1) <- wgs84CRS   # assume input lat and longs are WGS84
+glimpse(EF_Group_1_d1_filter_start_end_collar_1) 
+EF_Group_1_d1_filter_start_end_collar_2 <- spTransform(EF_Group_1_d1_filter_start_end_collar_1, mapCRS)
+
+glimpse(EF_Group_1_d1_filter_start_end_collar_2)
+
+EF_Group_1_d1_filter_start_end_collar = as.data.frame(EF_Group_1_d1_filter_start_end_collar_2) #this has the new coordinates projected !YES!!
+glimpse(EF_Group_1_d1_filter_start_end_collar)
+
+EF_Group_1_d1_filter_start_end_collar <- mutate(EF_Group_1_d1_filter_start_end_collar,
+                                        POINT_X = lon,  POINT_Y = lat )
 
 
 glimpse(EF_Group_1_d1_filter_start_end_collar)
@@ -58,7 +97,7 @@ df_sec1 <- mutate(df_sec1,
 ####################           split logged data into df for each sheep                     ##################################
 #############################################################################################################################
 glimpse(codes_EF_Group_1_d1)
-glimpse(glimpse(EF_Group_1_d1_filter_start_end_collar)) # 1732 data pts for all sheep
+glimpse(EF_Group_1_d1_filter_start_end_collar) # 1732 data pts for all sheep
 
 #this splits my data frame into lists 
 split_sheep <- split(EF_Group_1_d1_filter_start_end_collar, EF_Group_1_d1_filter_start_end_collar$sheep, drop = FALSE)
@@ -124,9 +163,8 @@ Sheep_26_collar_d1_time_step <- fill(Sheep_26_collar_d1_time_step1,  everything(
 
 dim(Sheep_21_collar_d1_time_step)
 dim(Sheep_22_collar_d1_time_step)
-ggplot(Sheep_22_collar_d1_time_step, aes(hms, lon))+
+ggplot(Sheep_21_collar_d1_time_step, aes(hms, lon))+
   geom_point()
-
 
 
 
