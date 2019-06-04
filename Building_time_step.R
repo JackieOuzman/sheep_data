@@ -55,50 +55,77 @@ df_sec1 <- mutate(df_sec1,
 
 
 ############################################################################################################################
-####################           slip logged data into df for each sheep                     ##################################
+####################           split logged data into df for each sheep                     ##################################
 #############################################################################################################################
 glimpse(codes_EF_Group_1_d1)
 glimpse(glimpse(EF_Group_1_d1_filter_start_end_collar)) # 1732 data pts for all sheep
 
-#this works but gives me a list I want a df
+#this splits my data frame into lists 
 split_sheep <- split(EF_Group_1_d1_filter_start_end_collar, EF_Group_1_d1_filter_start_end_collar$sheep, drop = FALSE)
-glimpse(split_sheep)
+glimpse(split_sheep) #List of 6
 
-library(tidyverse)
-test_df_split <- map(split_sheep, paste0, collapse = " ") %>% bind_rows() %>% gather(POS, Word)
-glimpse(test_df_split)
-
-test_df_split2 <- map(split_sheep, paste0, collapse = " ") 
-glimpse(test_df_split2)
+#list of names I want my data frames to be 
+sheep_names_EF_Group_1_d1 <- group_by(EF_Group_1_d1_filter_start_end_collar,  name) %>% 
+  count()
+print(sheep_names_EF_Group_1_d1)
 
 
+#subet each list in split_sheep to make df
+
+sheep21_collar_d1 <- split_sheep[[1]]
+glimpse(Sheep_21_collar_d1)
+Sheep22_collar_d1 <- split_sheep[[2]]  
+Sheep23_collar_d1 <- split_sheep[[3]]  
+Sheep24_collar_d1 <- split_sheep[[4]]
+Sheep25_collar_d1 <- split_sheep[[5]]
+Sheep26_collar_d1 <- split_sheep[[6]]
+
+#glimpse(Sheep_21_collar_d1)
+glimpse(Sheep22_collar_d1)
+glimpse(Sheep23_collar_d1)
+#glimpse(Sheep24_collar_d1)
+#glimpse(Sheep25_collar_d1)
+#glimpse(Sheep26_collar_d1)
 
 
 ############################################################################################################################
 ####################           merege time step data and logged data                     ##################################
 #############################################################################################################################                  
 
-#fill(df, clm, .direction = c("down"))  
-#fill(df, clm)
+#step 1 join
 glimpse(df_sec1) #14401 data pts
-glimpse(glimpse(EF_Group_1_d1_filter_start_end_collar)) # 1732 data pts for all sheep
-test <- full_join(df_sec1, EF_Group_1_d1_filter_start_end_collar, by = "hms")
-glimpse(test)
+glimpse(glimpse(Sheep_21_collar_d1)) # 343 data pts for Sheep_21_collar_d1
+Sheep_21_collar_d1_time_step1 <- full_join(df_sec1, Sheep_21_collar_d1, by = "hms")
+glimpse(Sheep_21_collar_d1_time_step1) #14401 data pts
 
-time_step_EF_Group_1_d1 <- (left_join(df_sec1,test, by = "hms"))
+#step 2 fill in missing values 
+Sheep_21_collar_d1_time_step <- fill(Sheep_21_collar_d1_time_step1,  everything())
+#data enetry has a problem d1 should be day1
+Sheep_21_collar_d1_time_step <- mutate(Sheep_21_collar_d1_time_step, name = "Sheep 21_collar_day1")
 
-##This has sort of worked but I have multiple entries for the same second
-#need to filter out data per sheep 
-# check out naming of Sheep 24_collar_day1 and Sheep 21_collar_d1 should be closer in name
+#now for the rest of the sheep in day1 
+
+Sheep_22_collar_d1_time_step1 <- full_join(df_sec1, Sheep22_collar_d1, by = "hms")
+Sheep_23_collar_d1_time_step1 <- full_join(df_sec1, Sheep23_collar_d1, by = "hms")
+Sheep_24_collar_d1_time_step1 <- full_join(df_sec1, Sheep24_collar_d1, by = "hms")
+Sheep_25_collar_d1_time_step1 <- full_join(df_sec1, Sheep25_collar_d1, by = "hms")
+Sheep_26_collar_d1_time_step1 <- full_join(df_sec1, Sheep26_collar_d1, by = "hms")
 
 
+Sheep_22_collar_d1_time_step <- fill(Sheep_22_collar_d1_time_step1,  everything())
+Sheep_23_collar_d1_time_step <- fill(Sheep_23_collar_d1_time_step1,  everything())
+Sheep_24_collar_d1_time_step <- fill(Sheep_24_collar_d1_time_step1,  everything())
+Sheep_25_collar_d1_time_step <- fill(Sheep_25_collar_d1_time_step1,  everything())
+Sheep_26_collar_d1_time_step <- fill(Sheep_26_collar_d1_time_step1,  everything())
 
+############################################################################################################################
+####################          check my data I have created                                ##################################
+############################################################################################################################# 
 
-
-
-
-
-
+dim(Sheep_21_collar_d1_time_step)
+dim(Sheep_22_collar_d1_time_step)
+ggplot(Sheep_22_collar_d1_time_step, aes(hms, lon))+
+  geom_point()
 
 
 
@@ -112,37 +139,7 @@ ggplot(test, aes(time, hms))+
 #looks like some data was lefted on the loggers? - or something else?
 #remove the 8th and find out what the max and min time is....
 
-#####            2) filter out missing data    ###########
 
-test_11_12nov <- filter(test, day != 8) 
-#according to the notes EFGroup3d1.csv was captured on the 12th Nov with start time of 08:03
-
-#######            min and max times of my data - not they are in wrong zone here #############
-max_time_12nov <- as_datetime(max(test_12nov$time))
-min_time_12nov <- as_datetime(min(test_12nov$time))
-#######           create df with min and max time #######################
-
-glimpse(max_time_12nov)
-range_time12nov <- data.frame(file = "EF_Group_3_d1.csv",
-                              min_date_time =(min_time_12nov),
-                              max_date_time =(max_time_12nov),
-                              min_time = hms::as.hms(min_time_12nov),
-                              max_time = hms::as.hms(max_time_12nov))
-glimpse(range_time12nov)
-
-
-#### make a data frame for time sequence using min and max time####
-
-seconds_in_range <- range_time12nov$max_time - range_time12nov$min_time
-
-######## This is my time step ########
-#I have used a start and stop time created from my data files - not sure i need this step
-time_step <- data.frame(seconds = range_time12nov$min_time:range_time12nov$max_time)
-time_step$seconds <- hms(seconds = time_step$seconds)
-glimpse(time_step)
-
-
-###Join my time step data to the sheep data
 
 
 ###JOBS to do ####
