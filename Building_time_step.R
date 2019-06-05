@@ -157,67 +157,62 @@ Sheep_24_collar_d1_time_step <- fill(Sheep_24_collar_d1_time_step1,  everything(
 Sheep_25_collar_d1_time_step <- fill(Sheep_25_collar_d1_time_step1,  everything())
 Sheep_26_collar_d1_time_step <- fill(Sheep_26_collar_d1_time_step1,  everything())
 
+#remove the missing data rows 
+colSums(is.na(Sheep_21_collar_d1_time_step)) #4 missing records
+Sheep_21_collar_d1_time_step <- filter(Sheep_21_collar_d1_time_step, POINT_X > 0)
+
+############################################################################################################################
+####################          make some new variable                                      ##################################
+#############################################################################################################################
+
+2^2
+sqrt(-4)
+
+
+Sheep_21_collar_d1_time_step <- mutate(Sheep_21_collar_d1_time_step,
+                                       x_diff_power2 = ((lead(POINT_X) - POINT_X)^2),
+                                       y_diff_power2 = ((lead(POINT_Y) - POINT_Y)^2))
+
+Sheep_21_collar_d1_time_step <- mutate(Sheep_21_collar_d1_time_step,
+                                       distance = sqrt((x_diff_power2+y_diff_power2)),
+                                       time_lapased =  (lead(time_step) - time_step))
+
+#Not sure I need this the animals arent moving much
+Sheep_21_collar_d1_time_step1 <- mutate(Sheep_21_collar_d1_time_step,
+                                        speed_class = case_when(
+                                          distance < 0.09 ~"stationary" ,
+                                          distance < 2.2 | distance > 0.09 ~"medium",
+                                          distance > 2.2 ~"fast",
+                                          TRUE ~ "no_class"))
+
+
 ############################################################################################################################
 ####################          check my data I have created                                ##################################
 ############################################################################################################################# 
 
 dim(Sheep_21_collar_d1_time_step)
 dim(Sheep_22_collar_d1_time_step)
-ggplot(Sheep_21_collar_d1_time_step, aes(hms, lon))+
+
+glimpse(Sheep_21_collar_d1_time_step)
+
+#distance covered
+ggplot(Sheep_21_collar_d1_time_step, aes(hms, distance))+       
   geom_point()
+#logged movement only and time of day
+filter(Sheep_21_collar_d1_time_step,distance != 0) %>% 
+  ggplot( aes(hms, distance))+       
+    geom_point()
+
+
+#distance covered
+ggplot(Sheep_21_collar_d1_time_step1, aes(hms, speed_class))+       
+  geom_point()
+
 
 ############################################################################################################################
-####################          make some new variable                                      ##################################
-#############################################################################################################################
+####################          export my data I have created                                ##################################
+############################################################################################################################# 
 
 
-df <-  mutate(Sheep_21_collar_d1_time_step,
-    time_diff = lead(hms) - hms)
-glimpse(df_1)
-df_1 <- mutate(Sheep_21_collar_d1_time_step,
-               x_diff = lead(POINT_X) - POINT_X,
-               y_diff = lead(POINT_Y) - POINT_Y)
+write_csv(Sheep_21_collar_d1_time_step, "C:/Users/ouz001/working_from_home/sheep_data/Sheep_21_collar_d1_time_step.csv")
 
-power(lead(Sheep_21_collar_d1_time_step$POINT_X) - Sheep_21_collar_d1_time_step$POINT_X, lambda =2)
-
-
-df_2 <- mutate(df_1,
-               x_diff_power2 = power(lead(POINT_X) - POINT_X, lambda =2),
-               y_diff_power2 = power(lead(POINT_Y) - POINT_Y, lambda = 2))
-
-#ts <- Sheep_21_collar_d1_time_step %>% arrange(hms) %>%
-#  mutate(time_diff_2 = as.numeric(hms-lag(hms), units = 'mins'))
-#glimpse(ts)
-
-ts1 <- Sheep_21_collar_d1_time_step %>% arrange(hms) %>%
-  mutate(distance = power(POINT_X-lag(POINT_X)))
-glimpse(ts)
-
-
-#Sheep_21_collar_d1_time_step = mutate(Sheep_21_collar_d1_time_step,
-#                                      Distance = sqrt (Power(x2 - x1)2 + (Power(y2 - y1)2),
-#                                       time_lapsed = hms2 - hms1
-#                                      Speed_m_per_s = distance /time laspsed
-#
-
-###               1) Plot data to chcekThis is a very important step to make sure I am not including too much data          ######
-ggplot(test, aes(time, hms))+
-  geom_point()
-#looks like some data was lefted on the loggers? - or something else?
-#remove the 8th and find out what the max and min time is....
-
-
-
-
-###JOBS to do ####
-
-#use the correct data with just hh or whatever i am ment to do doing
-#join time step and correct sheep data 
-# should be ok to use left_join() remember x = time step and y = sheep
-#Try these to fill in missing values - perhaps use mutate to chcek
-#fill(df, clm, .direction = c("down"))  
-#fill(df, clm)
-
-
-
-### I want to convert long lat to easting and northing
