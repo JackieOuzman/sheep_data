@@ -156,7 +156,7 @@ write_csv(EF_Group_1_d1_filter_start_end_collar,
 
 ##################             Step 1 bring in the raw logged data   ##############################################
 
-EF_Group_1_d2<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/EF_Group_1_d2.csv", skip=63) %>% 
+EF_Group_1_d2<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/EF_Group_1_d2.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "EF_Group_1_d2.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -193,7 +193,25 @@ glimpse(EF_Group_1_d2_filter_start_end)
 EF_Group_1_d2_filter_start_end_collar <- filter(EF_Group_1_d2_filter_start_end, type == "collar")
 #write.csv(EF_Group_1_d2_filter_start_end_hh, "EF_Group_1_d2_filter_start_end_hh_R.csv")
 #write.csv(EF_Group_1_d2_filter_start_end_collar, "EF_Group_1_d2_filter_start_end_collar_R.csv") 
-glimpse(EF_Group_1_d2_filter_start_end_hh)
+
+
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+glimpse(EF_Group_1_d2_filter_start_end_collar)
+
+coordinates(EF_Group_1_d2_filter_start_end_collar) <- ~ lon + lat
+proj4string(EF_Group_1_d2_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+EF_Group_1_d2_filter_start_end_collar_1 <- spTransform(EF_Group_1_d2_filter_start_end_collar, mapCRS)
+#make new df_1
+EF_Group_1_d2_filter_start_end_collar = as.data.frame(EF_Group_1_d2_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+EF_Group_1_d2_filter_start_end_collar <- mutate(EF_Group_1_d2_filter_start_end_collar,
+                                                POINT_X = lon,  POINT_Y = lat )
+
+####################          step 6 export data                                   ##################################
+write_csv(EF_Group_1_d2_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d2_filter_start_end_collar.csv") 
 
 
 ###################################################################################################################
