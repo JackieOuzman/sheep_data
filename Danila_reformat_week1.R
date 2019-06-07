@@ -106,7 +106,7 @@ EF_Group_1_d1 <- left_join(EF_Group_1_d1, codes_EF_Group_1_d1, by= "trksegID") %
          -temp)
 glimpse(EF_Group_1_d1) #44588
 
-#write.csv(EF_Group_1_d1, "EF_Group_1_d1.csv") 
+
 
 ##################        Step 3 filter data based on time                          ###################################
 
@@ -177,7 +177,7 @@ EF_Group_1_d2 <- left_join(EF_Group_1_d2, codes_EF_Group_1_d2, by= "trksegID") %
          ID = ID.x,
          -temp,
          -trksegID1)
-#write.csv(EF_Group_1_d2, "EF_Group_1_d2.csv") 
+
 
 ##################        Step 3 filter data based on time                          ###################################
 EF_Group_1_d2_filter_start <- filter(EF_Group_1_d2, hms > hms('09:00:00'))
@@ -191,8 +191,7 @@ glimpse(EF_Group_1_d2_filter_start_end)
 ##################        Step 4 filter data based on collar (not handheld)        ###################################
 #EF_Group_1_d2_filter_start_end_hh <- filter(EF_Group_1_d2_filter_start_end, type != "collar")
 EF_Group_1_d2_filter_start_end_collar <- filter(EF_Group_1_d2_filter_start_end, type == "collar")
-#write.csv(EF_Group_1_d2_filter_start_end_hh, "EF_Group_1_d2_filter_start_end_hh_R.csv")
-#write.csv(EF_Group_1_d2_filter_start_end_collar, "EF_Group_1_d2_filter_start_end_collar_R.csv") 
+
 
 
 ####################          step 5 convert lat and longs to x and Y               ##################################
@@ -221,7 +220,7 @@ write_csv(EF_Group_1_d2_filter_start_end_collar,
 
 ##################             Step 1 bring in the raw logged data   ##############################################
 
-EF_Group_1_d3<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/EF_Group_1_d3.csv", skip=63) %>% 
+EF_Group_1_d3<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/EF_Group_1_d3.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "EF_Group_1_d3.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -243,19 +242,43 @@ EF_Group_1_d3 <- left_join(EF_Group_1_d3, codes_EF_Group_1_d3, by= "trksegID") %
          -temp,
          -trksegID1)  
 ##################        Step 3 filter data based on time                          ###################################
-#write.csv(EF_Group_1_d3, "EF_Group_1_d3.csv")
+
 EF_Group_1_d3_filter_start <- filter(EF_Group_1_d3, hms > hms('08:50:00'))
 end_timeEF_Group_1_d3 <- hms('08:50:00') + hms('04:00:00')
 EF_Group_1_d3_filter_start_end <- filter(EF_Group_1_d3_filter_start, hms < end_timeEF_Group_1_d3)
 
-#write.csv(EF_Group_1_d3_filter_start_end, "EF_Group_1_d3_filter_start_end.csv")
+
 glimpse(EF_Group_1_d3_filter_start_end)
 ##################        Step 4 filter data based on collar (not handheld)        ###################################
-EF_Group_1_d3_filter_start_end_hh <- filter(EF_Group_1_d3_filter_start_end, type != "collar")
 EF_Group_1_d3_filter_start_end_collar <- filter(EF_Group_1_d3_filter_start_end, type == "collar")
-#write.csv(EF_Group_1_d3_filter_start_end_hh, "EF_Group_1_d3_filter_start_end_hh_R.csv")
-#write.csv(EF_Group_1_d3_filter_start_end_collar, "EF_Group_1_d3_filter_start_end_collar_R.csv") 
-glimpse(EF_Group_1_d3_filter_start_end_hh)
+
+glimpse(EF_Group_1_d3_filter_start_end_collar)
+
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+glimpse(EF_Group_1_d3_filter_start_end_collar)
+
+coordinates(EF_Group_1_d3_filter_start_end_collar) <- ~ lon + lat
+proj4string(EF_Group_1_d3_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+EF_Group_1_d3_filter_start_end_collar_1 <- spTransform(EF_Group_1_d3_filter_start_end_collar, mapCRS)
+#make new df_1
+EF_Group_1_d3_filter_start_end_collar = as.data.frame(EF_Group_1_d3_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+EF_Group_1_d3_filter_start_end_collar <- mutate(EF_Group_1_d3_filter_start_end_collar,
+                                                POINT_X = lon,  POINT_Y = lat )
+
+####################          step 6 export data                                   ##################################
+write_csv(EF_Group_1_d3_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d3_filter_start_end_collar.csv") 
+
+
+
+
+
+
+
+
 
   
 ###################################################################################################################
@@ -264,7 +287,7 @@ glimpse(EF_Group_1_d3_filter_start_end_hh)
 
 ##################             Step 1 bring in the raw logged data   ##############################################
 
-EF_Group_1_d4<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/EF_Group_1_d4.csv", skip=63) %>% 
+EF_Group_1_d4<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/EF_Group_1_d4.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "EF_Group_1_d4.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -297,11 +320,30 @@ EF_Group_1_d4_filter_start_end <- filter(EF_Group_1_d4_filter_start, hms < end_t
 glimpse(EF_Group_1_d4_filter_start_end)
 
 ##################        Step 4 filter data based on collar (not handheld)        ###################################
-EF_Group_1_d4_filter_start_end_hh <- filter(EF_Group_1_d4_filter_start_end, type != "collar")
+
 EF_Group_1_d4_filter_start_end_collar <- filter(EF_Group_1_d4_filter_start_end, type == "collar")
-#write.csv(EF_Group_1_d4_filter_start_end_hh, "EF_Group_1_d4_filter_start_end_hh_R.csv")
-#write.csv(EF_Group_1_d4_filter_start_end_collar, "EF_Group_1_d4_filter_start_end_collar_R.csv") 
-glimpse(EF_Group_1_d4_filter_start_end_hh)
+
+glimpse(EF_Group_1_d4_filter_start_end_collar)
+
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+glimpse(EF_Group_1_d4_filter_start_end_collar)
+
+coordinates(EF_Group_1_d4_filter_start_end_collar) <- ~ lon + lat
+proj4string(EF_Group_1_d4_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+EF_Group_1_d4_filter_start_end_collar_1 <- spTransform(EF_Group_1_d4_filter_start_end_collar, mapCRS)
+#make new df_1
+EF_Group_1_d4_filter_start_end_collar = as.data.frame(EF_Group_1_d4_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+EF_Group_1_d4_filter_start_end_collar <- mutate(EF_Group_1_d4_filter_start_end_collar,
+                                                POINT_X = lon,  POINT_Y = lat )
+
+####################          step 6 export data                                   ##################################
+write_csv(EF_Group_1_d4_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d4_filter_start_end_collar.csv") 
+
+
 
 
 
@@ -317,7 +359,7 @@ glimpse(EF_Group_1_d4_filter_start_end_hh)
 
 
 
-VF_Group_1_d1<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d1.csv", skip=63) %>% 
+VF_Group_1_d1<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d1.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "VF_Group_1_d1.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -346,20 +388,44 @@ VF_Group_1_d1 <- left_join(VF_Group_1_d1, codes_VF_Group_1_d1, by= "trksegID") %
 
 ##################        Step 3 filter data based on time                          ###################################
 glimpse(VF_Group_1_d1)
-#write.csv(VF_Group_1_d1, "VF_Group_1_d1.csv")
+
 VF_Group_1_d1_filter_start <- filter(VF_Group_1_d1, hms > hms('09:25:00'))
 end_timeVF_Group_1_d1 <- hms('09:25:00') + hms('04:00:00')
 VF_Group_1_d1_filter_start_end <- filter(VF_Group_1_d1_filter_start, hms < end_timeVF_Group_1_d1)
 
-
-#write.csv(VF_Group_1_d1_filter_start_end, "VF_Group_1_d1_filter_start_end.csv")
 glimpse(VF_Group_1_d1_filter_start_end)
 
-#VF_Group_1_d1_filter_start_end_hh <- filter(VF_Group_1_d1_filter_start_end, type != "collar")
 VF_Group_1_d1_filter_start_end_collar <- filter(VF_Group_1_d1_filter_start_end, type == "collar")
-#write.csv(VF_Group_1_d1_filter_start_end_hh, "VF_Group_1_d1_filter_start_end_hh_R.csv")
-#write.csv(VF_Group_1_d1_filter_start_end_collar, "VF_Group_1_d1_filter_start_end_collar_R.csv") 
-glimpse(VF_Group_1_d1_filter_start_end_hh)
+
+glimpse(VF_Group_1_d1_filter_start_end_collar)
+
+
+##################        Step 4 filter data based on collar (not handheld)        ###################################
+
+VF_Group_1_d1_filter_start_end_collar <- filter(VF_Group_1_d1_filter_start_end_collar, type == "collar")
+
+glimpse(VF_Group_1_d1_filter_start_end_collar)
+
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+glimpse(VF_Group_1_d1_filter_start_end_collar)
+
+coordinates(VF_Group_1_d1_filter_start_end_collar) <- ~ lon + lat
+proj4string(VF_Group_1_d1_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+VF_Group_1_d1_filter_start_end_collar_1 <- spTransform(VF_Group_1_d1_filter_start_end_collar, mapCRS)
+#make new df_1
+VF_Group_1_d1_filter_start_end_collar = as.data.frame(VF_Group_1_d1_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+VF_Group_1_d1_filter_start_end_collar <- mutate(VF_Group_1_d1_filter_start_end_collar,
+                                             POINT_X = lon,  POINT_Y = lat )
+
+
+####################          step 6 export data                                   ##################################
+write_csv(VF_Group_1_d1_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d1_filter_start_end_collar.csv") 
+
+
 
 
 ###################################################################################################################
@@ -369,7 +435,7 @@ glimpse(VF_Group_1_d1_filter_start_end_hh)
 ##################             Step 1 bring in the raw logged data   ##############################################
 
 
-VF_Group_1_d2<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d2.csv", skip=63) %>% 
+VF_Group_1_d2<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d2.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "VF_Group_1_d2.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -397,17 +463,47 @@ VF_Group_1_d2 <- left_join(VF_Group_1_d2, codes_VF_Group_1_d2, by= "trksegID") %
 #write.csv(VF_Group_1_d2, "VF_Group_1_d2.csv")
 ##################        Step 3 filter data based on time                          ###################################
 VF_Group_1_d2_filter_start <- filter(VF_Group_1_d2, hms > hms('09:15:00'))
-#write.csv(VF_Group_1_d2_filter_start, "VF_Group_1_d2_filter_start.csv")
+
 end_timeVF_Group_1_d2 <- hms('09:15:00') + hms('04:00:00')
 VF_Group_1_d2_filter_start_end <- filter(VF_Group_1_d2_filter_start, hms < end_timeVF_Group_1_d2)
 
 glimpse(VF_Group_1_d2_filter_start_end)
 ##################        Step 4 filter data based on collar (not handheld)        ###################################
-#VF_Group_1_d2_filter_start_end_hh <- filter(VF_Group_1_d2_filter_start_end, type != "collar")
+
 VF_Group_1_d2_filter_start_end_collar <- filter(VF_Group_1_d2_filter_start_end, type == "collar")
-#write.csv(VF_Group_1_d2_filter_start_end_hh, "VF_Group_1_d2_filter_start_end_hh_R.csv")
-#write.csv(VF_Group_1_d2_filter_start_end_collar, "VF_Group_1_d2_filter_start_end_collar_R.csv") 
-glimpse(VF_Group_1_d2_filter_start_end_hh)
+glimpse(VF_Group_1_d2_filter_start_end_collar)
+
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+glimpse(VF_Group_1_d2_filter_start_end_collar)
+
+coordinates(VF_Group_1_d2_filter_start_end_collar) <- ~ lon + lat
+proj4string(VF_Group_1_d2_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+VF_Group_1_d2_filter_start_end_collar_1 <- spTransform(VF_Group_1_d2_filter_start_end_collar, mapCRS)
+#make new df_1
+VF_Group_1_d2_filter_start_end_collar = as.data.frame(VF_Group_1_d2_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+VF_Group_1_d2_filter_start_end_collar <- mutate(VF_Group_1_d2_filter_start_end_collar,
+                                                POINT_X = lon,  POINT_Y = lat )
+
+
+####################          step 6 export data                                   ##################################
+write_csv(VF_Group_1_d2_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d2_filter_start_end_collar.csv") 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ###################################################################################################################
 ###################                   DAY3 VF Group 1 - week 1          ###########################################  
 ################################################################################################################## 
@@ -415,7 +511,7 @@ glimpse(VF_Group_1_d2_filter_start_end_hh)
 ##################             Step 1 bring in the raw logged data   ##############################################
 
 
-VF_Group_1_d3<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d3.csv", skip=63) %>% 
+VF_Group_1_d3<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d3.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "VF_Group_1_d3.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -440,20 +536,51 @@ VF_Group_1_d3 <- left_join(VF_Group_1_d3, codes_VF_Group_1_d3, by= "trksegID") %
          -trksegID1,
          -sheep_temp,
          -sheep1)     
-#write.csv(VF_Group_1_d3, "VF_Group_1_d3.csv") 
+
 ##################        Step 3 filter data based on time                          ###################################
 VF_Group_1_d3_filter_start <- filter(VF_Group_1_d3, hms > hms('08:53:00'))
 end_timeVF_Group_1_d3 <- hms('08:53:00') + hms('04:00:00')
 VF_Group_1_d3_filter_start_end <- filter(VF_Group_1_d3_filter_start, hms < end_timeVF_Group_1_d3)
 
-#write.csv(VF_Group_1_d3_filter_start_end, "VF_Group_1_d3_filter_start_end.csv")
+
 glimpse(VF_Group_1_d3_filter_start_end)
 ##################        Step 4 filter data based on collar (not handheld)        ###################################
-#VF_Group_1_d3_filter_start_end_hh <- filter(VF_Group_1_d3_filter_start_end, type != "collar")
+
 VF_Group_1_d3_filter_start_end_collar <- filter(VF_Group_1_d3_filter_start_end, type == "collar")
-#write.csv(VF_Group_1_d3_filter_start_end_hh, "VF_Group_1_d3_filter_start_end_hh_R.csv")
-#write.csv(VF_Group_1_d3_filter_start_end_collar, "VF_Group_1_d3_filter_start_end_collar_R.csv") 
-glimpse(VF_Group_1_d3_filter_start_end_hh)
+
+glimpse(VF_Group_1_d3_filter_start_end_collar)
+
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+glimpse(VF_Group_1_d3_filter_start_end_collar)
+
+coordinates(VF_Group_1_d3_filter_start_end_collar) <- ~ lon + lat
+proj4string(VF_Group_1_d3_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+VF_Group_1_d3_filter_start_end_collar_1 <- spTransform(VF_Group_1_d3_filter_start_end_collar, mapCRS)
+#make new df_1
+VF_Group_1_d3_filter_start_end_collar = as.data.frame(VF_Group_1_d3_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+VF_Group_1_d3_filter_start_end_collar <- mutate(VF_Group_1_d3_filter_start_end_collar,
+                                                POINT_X = lon,  POINT_Y = lat )
+
+
+####################          step 6 export data                                   ##################################
+write_csv(VF_Group_1_d3_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d3_filter_start_end_collar.csv") 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ###################################################################################################################
 ###################                   DAY4 VF Group 1 - week 1          ###########################################  
 ################################################################################################################## 
@@ -461,7 +588,7 @@ glimpse(VF_Group_1_d3_filter_start_end_hh)
 ##################             Step 1 bring in the raw logged data   ##############################################
 
 
-VF_Group_1_d4<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d4.csv", skip=63) %>% 
+VF_Group_1_d4<- read_csv("W:/VF/pasture_utilisation/Take2/raw_data/Week 1/VF_Group_1_d4.csv", skip=64) %>% 
   select(ID, trksegID, lat, lon,  ele, time) %>% 
   mutate(file_name = "VF_Group_1_d4.csv") %>% 
   separate(file_name,into =  c("fence", "group", "week", "day_of_exp"),  sep = "_", remove = FALSE ) %>% 
@@ -487,32 +614,98 @@ VF_Group_1_d4 <- left_join(VF_Group_1_d4, codes_VF_Group_1_d4, by= "trksegID") %
          -sheep_temp,
          -sheep1)        
 
-#write.csv(VF_Group_1_d4, "VF_Group_1_d4.csv")   
+
 ##################        Step 3 filter data based on time                          ###################################
 VF_Group_1_d4_filter_start <- filter(VF_Group_1_d4, hms > hms('08:43:00'))
 end_timeVF_Group_1_d4 <- hms('08:43:00') + hms('04:00:00')
 VF_Group_1_d4_filter_start_end <- filter(VF_Group_1_d4_filter_start, hms < end_timeVF_Group_1_d4)
 
-#write.csv(VF_Group_1_d4_filter_start_end, "VF_Group_1_d4_filter_start_end.csv")
+
 glimpse(VF_Group_1_d4_filter_start_end)
 ##################        Step 4 filter data based on collar (not handheld)        ###################################
-#VF_Group_1_d4_filter_start_end_hh <- filter(VF_Group_1_d4_filter_start_end, type != "collar")
+
 VF_Group_1_d4_filter_start_end_collar <- filter(VF_Group_1_d4_filter_start_end, type == "collar")
-#write.csv(VF_Group_1_d4_filter_start_end_hh, "VF_Group_1_d4_filter_start_end_hh_R.csv")
-#write.csv(VF_Group_1_d4_filter_start_end_collar, "VF_Group_1_d4_filter_start_end_collar_R.csv") 
-glimpse(VF_Group_1_d4_filter_start_end_hh)
+
+glimpse(VF_Group_1_d4_filter_start_end_collar)
   
-  
+####################          step 5 convert lat and longs to x and Y               ##################################
+
+
+
+coordinates(VF_Group_1_d4_filter_start_end_collar) <- ~ lon + lat
+proj4string(VF_Group_1_d4_filter_start_end_collar) <- wgs84CRS   # assume input lat and longs are WGS84
+#make new object_1
+VF_Group_1_d4_filter_start_end_collar_1 <- spTransform(VF_Group_1_d4_filter_start_end_collar, mapCRS)
+#make new df_1
+VF_Group_1_d4_filter_start_end_collar = as.data.frame(VF_Group_1_d4_filter_start_end_collar_1) #this has the new coordinates projected !YES!!
+#make new df with point x and point y
+VF_Group_1_d4_filter_start_end_collar <- mutate(VF_Group_1_d4_filter_start_end_collar,
+                                                POINT_X = lon,  POINT_Y = lat )
+
+
+####################          step 6 export data                                   ##################################
+write_csv(VF_Group_1_d4_filter_start_end_collar, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d4_filter_start_end_collar.csv") 
+
   
   
   
   
 #################################################################################################################################  
 ############################               summary of files that have been clipped                ##############################  
-
+#####     Week1    EF    #######
+#this first one might need another clm added to it
 EF_Group_1_d1_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d1_clipped.txt")
+EF_Group_1_d1_clipped <- mutate(EF_Group_1_d1_clipped, NEAR_FC = 'arm_hill_x1_nth')
+EF_Group_1_d2_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d2_clipped.txt")
+EF_Group_1_d3_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d3_clipped.txt")
+EF_Group_1_d4_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d4_clipped.txt")
+
+glimpse(EF_Group_1_d1_clipped)
+glimpse(EF_Group_1_d2_clipped)
+
+EF_Group_1_clipped <- rbind(EF_Group_1_d1_clipped,
+                            EF_Group_1_d2_clipped,
+                            EF_Group_1_d3_clipped,
+                            EF_Group_1_d4_clipped)
+glimpse(EF_Group_1_clipped)
+ggplot(EF_Group_1_clipped, aes(hms, NEAR_DIST, colour = day_of_exp))+
+  geom_point()+
+  facet_grid(day_of_exp~sheep)+
+  geom_hline(yintercept = 0)+
+  theme(axis.text.x=element_text(angle=90,hjust=1))+
+  labs(title= "EF week 1",
+       x= "Time of day",
+       y = "Distance (m)")
+
+#####     Week1    VF    #######
+
+VF_Group_1_d1_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d1_clipped.txt")
+VF_Group_1_d2_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d2_clipped.txt")
+VF_Group_1_d3_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d3_clipped.txt")
+VF_Group_1_d4_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/VF_Group_1_d4_clipped.txt")
+
+vF_Group_1_clipped <- rbind(VF_Group_1_d1_clipped,
+                            VF_Group_1_d2_clipped,
+                            VF_Group_1_d3_clipped,
+                            VF_Group_1_d4_clipped)
+
+glimpse(vF_Group_1_clipped)
+ggplot(vF_Group_1_clipped, aes(hms, NEAR_DIST, colour = day_of_exp))+
+  geom_point()+
+  facet_grid(day_of_exp~sheep)+
+  geom_hline(yintercept = 0)+
+  theme(axis.text.x=element_text(angle=90,hjust=1))+
+  labs(title= "VF week 1",
+       x= "Time of day",
+       y = "Distance (m)")
 
 
+write_csv(EF_Group_1_clipped, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_clipped.csv") 
+
+write_csv(vF_Group_1_clipped, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/vF_Group_1_clipped.csv") 
 
 
 ####stop here###
