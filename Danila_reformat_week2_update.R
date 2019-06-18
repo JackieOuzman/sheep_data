@@ -708,11 +708,11 @@ ggplot(vF_Group_2_clipped, aes(hms, NEAR_DIST, colour = day_of_exp))+
        y = "Distance (m)")
 
 
-write_csv(EF_Group_1_clipped, 
-          "W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_clipped.csv") 
+write_csv(EF_Group_2_clipped, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_2_clipped.csv") 
 
-write_csv(vF_Group_1_clipped, 
-          "W:/VF/pasture_utilisation/Take2/data_for_clipping/vF_Group_1_clipped.csv") 
+write_csv(vF_Group_2_clipped, 
+          "W:/VF/pasture_utilisation/Take2/data_for_clipping/vF_Group_2_clipped.csv") 
 
 
 ####stop here###

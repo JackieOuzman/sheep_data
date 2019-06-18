@@ -17,63 +17,44 @@ library(sf)
 
 
 ############################################################################################################################
-####################          Day 1   EF_Group_1_d1_filter_start_end_collar               ##################################
-#############################################################################################################################
-
-glimpse(EF_Group_1_d1_filter_start_end_collar)
-
-
-############################################################################################################################
-####################          convert lat and longs to x and Y                             ##################################
+####################          week1   EF_Group_1_clipped               ##################################
 #############################################################################################################################
 
 
-#https://spatialreference.org/ref/epsg/gda94-mga-zone-56/
-#epsg projection 28356
+EF_Group_1_d1_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d1_clipped.txt")
+EF_Group_1_d1_clipped <- mutate(EF_Group_1_d1_clipped, NEAR_FC = 'arm_hill_x1_nth')
 
-mapCRS <- CRS("+init=epsg:28356")     # 28356 = GDA_1994_MGA_Zone_56
-wgs84CRS <- CRS("+init=epsg:4326")   # 4326 WGS 84 - assumed for input lats and longs
-
-glimpse(EF_Group_1_d1_filter_start_end_collar) 
-
-#start of file has some missing data that has not been filled
-EF_Group_1_d1_filter_start_end_collar_1 <-drop_na(EF_Group_1_d1_filter_start_end_collar)
-glimpse(EF_Group_1_d1_filter_start_end_collar_1)
+EF_Group_1_d2_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d2_clipped.txt")
+EF_Group_1_d3_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d3_clipped.txt")
+EF_Group_1_d4_clipped <- read_csv("W:/VF/pasture_utilisation/Take2/data_for_clipping/EF_Group_1_d4_clipped.txt")
 
 
-coordinates(EF_Group_1_d1_filter_start_end_collar_1) <- ~ lon + lat
+EF_Group_1_clipped <- rbind(EF_Group_1_d1_clipped,
+                            EF_Group_1_d2_clipped,
+                            EF_Group_1_d3_clipped,
+                            EF_Group_1_d4_clipped)
 
-proj4string(EF_Group_1_d1_filter_start_end_collar_1) <- wgs84CRS   # assume input lat and longs are WGS84
-glimpse(EF_Group_1_d1_filter_start_end_collar_1) 
-EF_Group_1_d1_filter_start_end_collar_2 <- spTransform(EF_Group_1_d1_filter_start_end_collar_1, mapCRS)
-
-glimpse(EF_Group_1_d1_filter_start_end_collar_2)
-
-EF_Group_1_d1_filter_start_end_collar = as.data.frame(EF_Group_1_d1_filter_start_end_collar_2) #this has the new coordinates projected !YES!!
-glimpse(EF_Group_1_d1_filter_start_end_collar)
-
-EF_Group_1_d1_filter_start_end_collar <- mutate(EF_Group_1_d1_filter_start_end_collar,
-                                        POINT_X = lon,  POINT_Y = lat )
-
-
-glimpse(EF_Group_1_d1_filter_start_end_collar)
 
 ############################################################################################################################
-#####################                    Min time for data set                     #########################################
+#####################                    Min time for data set  EF_Group_1_clipped                   #########################################
 ############################################################################################################################
 
-min_time1 <- (min(EF_Group_1_d1_filter_start_end_collar$hms))
+min_time1 <- (min(EF_Group_1_clipped$hms))
 print(min_time1) 
 print(hms::as.hms(min_time1) )
 min_time <- hms::as.hms(min_time1)
 print(min_time) 
 date_time_start <- as_datetime(paste0("2018-10-29 ", min_time))
+
 ############################################################################################################################
-####################                    Max time for data set                     #########################################
+####################                    Max time for data set  EF_Group_1_clipped                   #########################################
 ############################################################################################################################
-print(date_time_start)
-date_time_end <- date_time_start + hms('4:00:00')
-print(date_time_end)
+max_time1 <- (max(EF_Group_1_clipped$hms))
+print(max_time1) 
+max_time <- hms::as.hms(max_time1)
+print(max_time) 
+date_time_end <- as_datetime(paste0("2018-10-29 ", max_time))
+
 
 ############################################################################################################################
 ####################                    time step starting at min and ending at max       ##################################
@@ -96,15 +77,15 @@ df_sec1 <- mutate(df_sec1,
 ############################################################################################################################
 ####################           split logged data into df for each sheep                     ##################################
 #############################################################################################################################
-glimpse(codes_EF_Group_1_d1)
-glimpse(EF_Group_1_d1_filter_start_end_collar) # 1732 data pts for all sheep
+
+glimpse(EF_Group_1_d1_clipped) # 1168 data pts for all sheep
 
 #this splits my data frame into lists 
-split_sheep <- split(EF_Group_1_d1_filter_start_end_collar, EF_Group_1_d1_filter_start_end_collar$sheep, drop = FALSE)
+split_sheep <- split(EF_Group_1_d1_clipped, EF_Group_1_d1_clipped$sheep, drop = FALSE)
 glimpse(split_sheep) #List of 6
 
 #list of names I want my data frames to be 
-sheep_names_EF_Group_1_d1 <- group_by(EF_Group_1_d1_filter_start_end_collar,  name) %>% 
+sheep_names_EF_Group_1_d1 <- group_by(EF_Group_1_d1_clipped,  name) %>% 
   count()
 print(sheep_names_EF_Group_1_d1)
 
@@ -112,54 +93,132 @@ print(sheep_names_EF_Group_1_d1)
 #subet each list in split_sheep to make df
 
 sheep21_collar_d1 <- split_sheep[[1]]
-glimpse(sheep21_collar_d1)
 Sheep22_collar_d1 <- split_sheep[[2]]  
 Sheep23_collar_d1 <- split_sheep[[3]]  
 Sheep24_collar_d1 <- split_sheep[[4]]
 Sheep25_collar_d1 <- split_sheep[[5]]
 Sheep26_collar_d1 <- split_sheep[[6]]
 
-#glimpse(Sheep_21_collar_d1)
-glimpse(Sheep22_collar_d1)
-glimpse(Sheep23_collar_d1)
-#glimpse(Sheep24_collar_d1)
-#glimpse(Sheep25_collar_d1)
-#glimpse(Sheep26_collar_d1)
+dim(sheep21_collar_d1)
+dim(Sheep22_collar_d1)
+dim(Sheep23_collar_d1)
+dim(Sheep24_collar_d1)
+dim(Sheep25_collar_d1)
+dim(Sheep26_collar_d1)
 
 
 ############################################################################################################################
 ####################           merege time step data and logged data                     ##################################
 #############################################################################################################################                  
 
+
+glimpse(df_sec1) #16,645 data pts df is reg time step
+glimpse(sheep21_collar_d1) # 241 data pts for Sheep_21_collar_d1
+
+
 #step 1 join
-glimpse(df_sec1) #14401 data pts
-glimpse(sheep21_collar_d1) # 343 data pts for Sheep_21_collar_d1
-Sheep_21_collar_d1_time_step1 <- full_join(df_sec1, sheep21_collar_d1, by = "hms")
-glimpse(Sheep_21_collar_d1_time_step1) #14401 data pts
-
-#step 2 fill in missing values 
-Sheep_21_collar_d1_time_step <- fill(Sheep_21_collar_d1_time_step1,  everything())
-#data enetry has a problem d1 should be day1
-Sheep_21_collar_d1_time_step <- mutate(Sheep_21_collar_d1_time_step, name = "Sheep 21_collar_day1")
-
-#now for the rest of the sheep in day1 
-
+sheep_21_collar_d1_time_step1 <- full_join(df_sec1, sheep21_collar_d1, by = "hms")
 Sheep_22_collar_d1_time_step1 <- full_join(df_sec1, Sheep22_collar_d1, by = "hms")
 Sheep_23_collar_d1_time_step1 <- full_join(df_sec1, Sheep23_collar_d1, by = "hms")
 Sheep_24_collar_d1_time_step1 <- full_join(df_sec1, Sheep24_collar_d1, by = "hms")
 Sheep_25_collar_d1_time_step1 <- full_join(df_sec1, Sheep25_collar_d1, by = "hms")
 Sheep_26_collar_d1_time_step1 <- full_join(df_sec1, Sheep26_collar_d1, by = "hms")
 
+#dim(sheep_21_collar_d1_time_step1)
+#colSums(is.na(sheep_21_collar_d1_time_step1))
 
-Sheep_22_collar_d1_time_step <- fill(Sheep_22_collar_d1_time_step1,  everything())
-Sheep_23_collar_d1_time_step <- fill(Sheep_23_collar_d1_time_step1,  everything())
-Sheep_24_collar_d1_time_step <- fill(Sheep_24_collar_d1_time_step1,  everything())
-Sheep_25_collar_d1_time_step <- fill(Sheep_25_collar_d1_time_step1,  everything())
-Sheep_26_collar_d1_time_step <- fill(Sheep_26_collar_d1_time_step1,  everything())
+#step 2 fill in missing values 
+Sheep_21_collar_d1_time_step <- fill(sheep_21_collar_d1_time_step1,  .direction = "down", everything())
+Sheep_22_collar_d1_time_step <- fill(Sheep_22_collar_d1_time_step1,  .direction = "down",everything())
+Sheep_23_collar_d1_time_step <- fill(Sheep_23_collar_d1_time_step1,  .direction = "down",everything())
+Sheep_24_collar_d1_time_step <- fill(Sheep_24_collar_d1_time_step1,  .direction = "down",everything())
+Sheep_25_collar_d1_time_step <- fill(Sheep_25_collar_d1_time_step1,  .direction = "down",everything())
+Sheep_26_collar_d1_time_step <- fill(Sheep_26_collar_d1_time_step1,  .direction = "down",everything())
+
+#dim(Sheep_21_collar_d1_time_step)
+#colSums(is.na(Sheep_21_collar_d1_time_step))
+
+#step 2 fill in missing values that are up 
+Sheep_21_collar_d1_time_step <- fill(Sheep_21_collar_d1_time_step,  .direction = "up", everything())
+Sheep_22_collar_d1_time_step <- fill(Sheep_22_collar_d1_time_step,  .direction = "up", everything())
+Sheep_23_collar_d1_time_step <- fill(Sheep_23_collar_d1_time_step,  .direction = "up", everything())
+Sheep_24_collar_d1_time_step <- fill(Sheep_24_collar_d1_time_step,  .direction = "up", everything())
+Sheep_25_collar_d1_time_step <- fill(Sheep_25_collar_d1_time_step,  .direction = "up", everything())
+Sheep_26_collar_d1_time_step <- fill(Sheep_26_collar_d1_time_step,  .direction = "up", everything())
+
+
+#dim(Sheep_21_collar_d1_time_step)
+#colSums(is.na(Sheep_21_collar_d1_time_step))
+
+#data enetry has a problem d1 should be day1
+Sheep_21_collar_d1_time_step <- mutate(Sheep_21_collar_d1_time_step, name = "Sheep 21_collar_day1")
+
 
 #remove the missing data rows 
-colSums(is.na(Sheep_21_collar_d1_time_step)) #4 missing records
-Sheep_21_collar_d1_time_step <- filter(Sheep_21_collar_d1_time_step, POINT_X > 0)
+colSums(is.na(Sheep_21_collar_d1_time_step)) #0 missing records
+colSums(is.na(Sheep_22_collar_d1_time_step))
+colSums(is.na(Sheep_23_collar_d1_time_step))
+colSums(is.na(Sheep_24_collar_d1_time_step))
+colSums(is.na(Sheep_25_collar_d1_time_step))
+colSums(is.na(Sheep_26_collar_d1_time_step))
+
+
+############################################################################################################################
+####################          export my data I have created                                ##################################
+############################################################################################################################# 
+
+#EF_week1
+
+dim(Sheep_21_collar_d1_time_step) #16,645
+dim(Sheep_22_collar_d1_time_step) #16,645
+dim(Sheep_23_collar_d1_time_step)
+dim(Sheep_24_collar_d1_time_step)
+dim(Sheep_25_collar_d1_time_step)
+dim(Sheep_26_collar_d1_time_step)
+
+
+write_csv(Sheep_21_collar_d1_time_step, "W:/VF/pasture_utilisation/Take2/reg_time_step/EF_week1/Sheep_21_collar_d1_time_step.csv")
+write_csv(Sheep_22_collar_d1_time_step, "W:/VF/pasture_utilisation/Take2/reg_time_step/EF_week1/Sheep_22_collar_d1_time_step.csv")
+write_csv(Sheep_23_collar_d1_time_step, "W:/VF/pasture_utilisation/Take2/reg_time_step/EF_week1/Sheep_23_collar_d1_time_step.csv")
+write_csv(Sheep_24_collar_d1_time_step, "W:/VF/pasture_utilisation/Take2/reg_time_step/EF_week1/Sheep_24_collar_d1_time_step.csv")
+write_csv(Sheep_25_collar_d1_time_step, "W:/VF/pasture_utilisation/Take2/reg_time_step/EF_week1/Sheep_25_collar_d1_time_step.csv")
+write_csv(Sheep_26_collar_d1_time_step, "W:/VF/pasture_utilisation/Take2/reg_time_step/EF_week1/Sheep_26_collar_d1_time_step.csv")
+
+
+
+############################################################################################################################
+####################          check my data I have created                                ##################################
+############################################################################################################################# 
+
+dim(Sheep_21_collar_d1_time_step)
+dim(Sheep_22_collar_d1_time_step)
+
+glimpse(Sheep_21_collar_d1_time_step)
+
+#distance covered
+ggplot(Sheep_21_collar_d1_time_step, aes(hms, lon))+       
+  geom_point()
+#logged movement only and time of day
+filter(Sheep_21_collar_d1_time_step,distance != 0) %>% 
+  ggplot( aes(hms, distance))+       
+    geom_point()
+
+############################################################################################################################
+####################          ouput the individual sheep data I have created                                ##################################
+############################################################################################################################# 
+
+write_csv(Sheep_22_collar_d1_time_step,)
+
+Sheep_22_collar_d1_time_step
+
+
+
+
+
+
+
+
+
 
 ############################################################################################################################
 ####################          make some new variable                                      ##################################
@@ -184,35 +243,4 @@ Sheep_21_collar_d1_time_step1 <- mutate(Sheep_21_collar_d1_time_step,
                                           distance < 2.2 | distance > 0.09 ~"medium",
                                           distance > 2.2 ~"fast",
                                           TRUE ~ "no_class"))
-
-
-############################################################################################################################
-####################          check my data I have created                                ##################################
-############################################################################################################################# 
-
-dim(Sheep_21_collar_d1_time_step)
-dim(Sheep_22_collar_d1_time_step)
-
-glimpse(Sheep_21_collar_d1_time_step)
-
-#distance covered
-ggplot(Sheep_21_collar_d1_time_step, aes(hms, distance))+       
-  geom_point()
-#logged movement only and time of day
-filter(Sheep_21_collar_d1_time_step,distance != 0) %>% 
-  ggplot( aes(hms, distance))+       
-    geom_point()
-
-
-#distance covered
-ggplot(Sheep_21_collar_d1_time_step1, aes(hms, speed_class))+       
-  geom_point()
-
-
-############################################################################################################################
-####################          export my data I have created                                ##################################
-############################################################################################################################# 
-
-
-write_csv(Sheep_21_collar_d1_time_step, "C:/Users/ouz001/working_from_home/sheep_data/Sheep_21_collar_d1_time_step.csv")
 
